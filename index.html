@@ -8,173 +8,190 @@
 <style>
 :root{
 --bg:#17191f;--panel:#20232b;--editor:#191c23;
---text:#e5e5e5;--green:#65d98a;--border:#343943
+--text:#e5e5e5;--green:#65d98a;--border:#343943;
+--muted:#9299a6
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+body.light{--bg:#f0f1f4;--panel:#fff;--editor:#fafafa;--text:#222;--border:#d4d7de;--muted:#666}
 header{height:55px;background:var(--panel);display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--border)}
 .logo{font-size:21px;font-weight:bold}
 .logo span{color:var(--green)}
-button{cursor:pointer;border:0;border-radius:6px;padding:10px}
+button{cursor:pointer;border:0;border-radius:6px;padding:9px 12px}
 #play{background:#38c96b;color:#102b19;font-weight:bold;font-size:16px}
-main{display:flex;height:calc(100dvh - 55px)}
-aside{width:52px;background:var(--panel);display:flex;align-items:center;flex-direction:column;gap:25px;padding-top:20px}
-.tool{font-size:23px;color:#aaa;background:none}
-.tool:hover{color:var(--green)}
+main{display:flex;height:calc(100dvh - 82px)}
+aside{width:48px;background:var(--panel);display:flex;align-items:center;flex-direction:column;gap:20px;padding-top:18px}
+.tool{font-size:22px;color:var(--muted);background:none}
 .workspace{flex:1;min-width:0;display:flex;flex-direction:column}
-.tab{height:40px;background:#252932;padding:12px;font-size:13px}
-.editor{flex:1;min-height:180px;padding:12px;background:var(--editor)}
-textarea{width:100%;height:100%;min-height:230px;resize:none;background:transparent;color:#a9e6b9;border:0;outline:0;font:15px monospace;line-height:1.7}
-.terminal{height:145px;background:#111319;border-top:1px solid var(--border);padding:12px;font:13px monospace;overflow:auto}
-.terminal-title{color:#aaa;margin-bottom:12px}
+.tab{height:38px;background:var(--panel);padding:12px;font-size:13px}
+.editor{flex:1;min-height:150px;background:var(--editor);display:flex;overflow:hidden;padding:10px 0}
+#gutter{width:38px;flex-shrink:0;text-align:right;padding-right:9px;color:#737b89;font:14px/1.7 monospace;white-space:pre;overflow:hidden;user-select:none}
+#code{flex:1;min-width:0;height:100%;min-height:230px;resize:none;background:transparent;color:#a9e6b9;border:0;outline:0;padding:0 10px 0 4px;font:15px/1.7 monospace;white-space:pre;overflow:auto}
+.terminal{height:145px;background:#111319;border-top:1px solid var(--border);padding:10px 12px;font:13px monospace;overflow:auto}
+.terminal-head{display:flex;justify-content:space-between;margin-bottom:12px;color:#aaa}
 #output{white-space:pre-wrap;color:#b9e8c4}
-.status{color:#777;margin-top:10px}
-#settings{display:none;position:fixed;inset:55px 0 0;background:var(--bg);z-index:5;overflow:auto;padding:18px}
+#status{color:#777;margin-top:10px}
+footer{height:27px;background:#263c32;color:#d5f5df;display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:11px}
+#settings{display:none;position:fixed;inset:55px 0 27px;background:var(--bg);z-index:5;overflow:auto;padding:16px}
 .settings-head{display:flex;justify-content:space-between;align-items:center}
-.settings-head h2{font-size:20px}
-.close{background:#343943;color:white}
-.group{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:14px;margin:14px 0}
-.group h3{margin:0 0 14px;color:var(--green);font-size:15px}
-.option{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.group{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:13px;margin:13px 0}
+.group h3{color:var(--green);font-size:14px;margin:0 0 12px}
+.option{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
 .option:last-child{border:0}
-select,input[type=number]{background:#303540;color:white;border:1px solid #555;border-radius:5px;padding:7px;max-width:125px}
-.future{font-size:11px;color:#e6b66b}
-#toast{color:var(--green);font-size:12px;margin-top:10px}
-body.light{--bg:#f0f1f4;--panel:#fff;--editor:#fafafa;--text:#222;--border:#d4d7de}
-body.light .tab{background:#e4e6eb;color:#222}
-body.light .terminal{background:#20232b;color:white}
-@media(max-width:500px){aside{width:43px}#settings{padding:12px}}
+select{max-width:125px;background:#303540;color:white;border:1px solid #555;border-radius:5px;padding:7px}
+.close,.clear{background:#343943;color:white}
+@media(max-width:500px){aside{width:40px}#settings{padding:11px}}
 </style>
 </head>
 <body>
 <header>
- <div class="logo">factory<span>FL</span></div>
- <button id="play" onclick="runFL()">▶ Play</button>
+<div class="logo">factory<span>FL</span></div>
+<button id="play" onclick="runFL()">▶ Play</button>
 </header>
-
 <main>
- <aside>
-  <button class="tool" title="Explorer">▤</button>
-  <button class="tool" title="Pesquisar">⌕</button>
-  <button class="tool" title="Configurações" onclick="openSettings()">⚙</button>
- </aside>
- <section class="workspace">
-  <div class="tab">● main.fl</div>
-  <div class="editor">
+<aside>
+<button class="tool" title="Explorer">▤</button>
+<button class="tool" title="Pesquisar">⌕</button>
+<button class="tool" title="Configurações" onclick="openSettings()">⚙</button>
+</aside>
+<section class="workspace">
+<div class="tab">● main.fl</div>
+<div class="editor">
+<div id="gutter">1</div>
 <textarea id="code" spellcheck="false"><Fl2play!] = on the FL
 
 __2
 L1_say("Hello from Fast Language!")_
 
 end.</textarea>
-  </div>
-  <div class="terminal">
-   <div class="terminal-title">TERMINAL · FL ENGINE</div>
-   <div id="output">factoryFL iniciado.
+</div>
+<div class="terminal">
+<div class="terminal-head">
+<span>TERMINAL · FL ENGINE</span>
+<button class="clear" onclick="clearTerminal()">Limpar</button>
+</div>
+<div id="output">factoryFL iniciado.
 Aguardando execução...</div>
-   <div class="status" id="status">READY</div>
-  </div>
- </section>
-</main>
-
-<section id="settings">
- <div class="settings-head">
-  <h2>⚙ Configurações</h2>
-  <button class="close" onclick="closeSettings()">Fechar ✕</button>
- </div>
-
- <div class="group">
-  <h3>EDITOR</h3>
-  <div class="option">Tema
-   <select id="theme" onchange="changeTheme(this.value)">
-    <option value="dark">Escuro</option>
-    <option value="light">Claro</option>
-   </select>
-  </div>
-  <div class="option">Tamanho da fonte
-   <input type="number" min="10" max="30" value="15" onchange="changeFont(this.value)">
-  </div>
-  <div class="option">Números de linha
-   <span class="future">Futuro</span>
-  </div>
-  <div class="option">Minimapa
-   <span class="future">Futuro</span>
-  </div>
-  <div class="option">Auto-indentação
-   <span class="future">Futuro</span>
-  </div>
- </div>
-
- <div class="group">
-  <h3>EXECUÇÃO</h3>
-  <div class="option">Auto-save
-   <span class="future">Futuro</span>
-  </div>
-  <div class="option">Limite de FPS
-   <select>
-    <option>30 FPS</option><option>60 FPS</option>
-    <option>120 FPS</option><option>Ilimitado</option>
-   </select>
-  </div>
-  <div class="option">Modo de execução
-   <select><option>Normal</option><option>Debug</option></select>
-  </div>
- </div>
-
- <div class="group">
-  <h3>FL ENGINE</h3>
-  <div class="option">Versão <span>0.3 Prototype</span></div>
-  <div class="option">Compilar para Android <span class="future">Futuro</span></div>
-  <div class="option">Compilar para PC <span class="future">Futuro</span></div>
-  <div class="option">Depurador <span class="future">Futuro</span></div>
- </div>
-
- <div class="group">
-  <h3>PROJETO</h3>
-  <div class="option">Extensão principal <span>.fl</span></div>
-  <div class="option">Exportar APK <span class="future">Futuro</span></div>
-  <div class="option">Exportar EXE <span class="future">Futuro</span></div>
- </div>
- <div id="toast"></div>
+<div id="status">READY</div>
+</div>
 </section>
-
+</main>
+<footer>
+<span id="lineInfo">Linhas: 6</span>
+<span id="saveInfo">FL · Pronto</span>
+</footer>
+<section id="settings">
+<div class="settings-head">
+<h2>⚙ Configurações</h2>
+<button class="close" onclick="closeSettings()">Fechar ✕</button>
+</div>
+<div class="group">
+<h3>EDITOR</h3>
+<div class="option">Tema
+<select id="theme" onchange="changeTheme(this.value)">
+<option value="dark">Escuro</option>
+<option value="light">Claro</option>
+</select>
+</div>
+<div class="option">Tamanho da fonte
+<select id="fontSize" onchange="changeFont(this.value)">
+<option>12</option><option>14</option><option selected>15</option><option>16</option><option>18</option><option>20</option>
+</select>
+</div>
+<div class="option">Números de linha <span>Ativado</span></div>
+<div class="option">Auto-save <span>Ativado</span></div>
+</div>
+<div class="group">
+<h3>EXECUÇÃO</h3>
+<div class="option">Modo
+<select><option>Normal</option><option>Debug</option></select>
+</div>
+<div class="option">Limite de FPS
+<select><option>30</option><option selected>60</option><option>120</option><option>Ilimitado</option></select>
+</div>
+</div>
+<div class="group">
+<h3>FL ENGINE</h3>
+<div class="option">Versão <span>0.3 Prototype</span></div>
+<div class="option">Android <span>Planejado</span></div>
+<div class="option">PC <span>Planejado</span></div>
+<div class="option">Depurador <span>Planejado</span></div>
+</div>
+<div class="group">
+<h3>PROJETO</h3>
+<div class="option">Extensão <span>.fl</span></div>
+<div class="option">Exportar APK <span>Planejado</span></div>
+<div class="option">Exportar EXE <span>Planejado</span></div>
+</div>
+</section>
 <script>
-function openSettings(){
- document.getElementById("settings").style.display="block";
+const code=document.getElementById("code");
+const gutter=document.getElementById("gutter");
+const output=document.getElementById("output");
+const status=document.getElementById("status");
+
+function updateEditor(){
+const lines=code.value.split("\n").length;
+gutter.textContent=Array.from({length:lines},(_,i)=>i+1).join("\n");
+document.getElementById("lineInfo").textContent="Linhas: "+lines+" · Caracteres: "+code.value.length;
 }
-function closeSettings(){
- document.getElementById("settings").style.display="none";
+function saveCode(){
+try{
+localStorage.setItem("factoryFL_code",code.value);
+document.getElementById("saveInfo").textContent="Salvo ✓";
+}catch(e){
+document.getElementById("saveInfo").textContent="Não foi possível salvar";
+}
+}
+function loadSettings(){
+try{
+const saved=localStorage.getItem("factoryFL_code");
+if(saved!==null)code.value=saved;
+const theme=localStorage.getItem("factoryFL_theme")||"dark";
+document.getElementById("theme").value=theme;
+changeTheme(theme);
+const size=localStorage.getItem("factoryFL_font")||"15";
+document.getElementById("fontSize").value=size;
+changeFont(size);
+}catch(e){}
+updateEditor();
 }
 function changeTheme(value){
- document.body.classList.toggle("light",value==="light");
+document.body.classList.toggle("light",value==="light");
+try{localStorage.setItem("factoryFL_theme",value)}catch(e){}
 }
 function changeFont(value){
- const size=Math.max(10,Math.min(30,Number(value)||15));
- document.getElementById("code").style.fontSize=size+"px";
+code.style.fontSize=value+"px";
+gutter.style.fontSize=value+"px";
+try{localStorage.setItem("factoryFL_font",value)}catch(e){}
+}
+function openSettings(){document.getElementById("settings").style.display="block"}
+function closeSettings(){document.getElementById("settings").style.display="none"}
+function clearTerminal(){
+output.textContent="Terminal limpo.";
+status.textContent="READY";
 }
 function runFL(){
- const source=document.getElementById("code").value;
- const output=document.getElementById("output");
- const status=document.getElementById("status");
- output.textContent="";
- status.textContent="RUNNING";
- let foundEnd=false;
- for(const line of source.split(/\r?\n/)){
-  if(line.trim()==="end."){
-   foundEnd=true;
-   break;
-  }
-  const match=line.match(/_say\("([\s\S]*)"\)_/);
-  if(match)output.textContent+=match[1]+"\n";
- }
- if(!foundEnd){
-  output.textContent+="FL Error: end. não encontrado.";
-  status.textContent="ERROR";
- }else{
-  if(!output.textContent)output.textContent="Programa executado.";
-  status.textContent="FINISHED";
- }
+const source=code.value;
+output.textContent="";
+status.textContent="RUNNING";
+let foundEnd=false;
+for(const line of source.split(/\r?\n/)){
+if(line.trim()==="end."){foundEnd=true;break}
+const match=line.match(/_say\("([\s\S]*)"\)_/);
+if(match)output.textContent+=match[1]+"\n";
 }
+if(!foundEnd){
+output.textContent+="FL Error: end. não encontrado.";
+status.textContent="ERROR";
+}else{
+if(!output.textContent)output.textContent="Programa executado.";
+status.textContent="FINISHED";
+}
+}
+code.addEventListener("input",()=>{updateEditor();saveCode()});
+code.addEventListener("scroll",()=>{gutter.scrollTop=code.scrollTop});
+loadSettings();
 </script>
 </body>
 </html>
